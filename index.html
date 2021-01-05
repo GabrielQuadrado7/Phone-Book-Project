@@ -1,0 +1,195 @@
+# Phone-Book-Project
+## some comments in the code but it is working. I hope it helps those in need
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset= "UTF-8">
+	<title>AR - Agenda Telefonica</title>	
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<script src="https://kit.fontawesome.com/6516792476.js" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+	
+</head>
+
+<body>
+
+<div class="container" id="result">
+
+	<header>
+		<img src="imagens/ar.png" alt="ar-imagem" width="150px" height="150px">
+		<h3 class="text-center"><font face="impact" color="#333333">AGENDA TELEFÔNICA</font></h3>
+	</header>
+	
+		<form class="form" name="cadastrar"
+		id="formulario">
+		
+		<div class="text-center">
+			<font face="impact" color="#404040"><h5>Nome:</h5></font>
+			<input type="text" name="nome" id="nome" size="30"
+			placeholder="Digite nome aqui" required />
+		</div>
+		<div class="text-center">
+			<font face="impact" color="#404040"><h5>Telefone:</h5></font>
+			<input type="tel" name="telefone" id="telefone" size="20" 
+			placeholder="Digite telefone aqui" required />
+		</div>
+		<div class="text-center">
+			<font face="impact" color="#404040"><h5>Email:</h5></font>
+			<input type="email" name="email" id="email" size="30" 
+			placeholder="Digite email aqui" required />
+		</div>	
+		<div class="text-right">
+			<button class="btn btn-primary btn-lg" id="Gravar">Gravar</button>
+		</div>
+		</form>
+
+</div>
+<hr>
+		<button class="btn btn-primary btn-lg" id="Listar">Listar</button>
+		<table class="table table-striped" id="lista">
+		</table><br>
+<script>
+
+$(document).ready(function(){
+
+$("#Listar").click(function() {
+
+
+
+	  if (typeof(Storage) !== "undefined") {	
+		
+		var agenda=JSON.parse(localStorage.getItem("agenda"));
+		$("#lista tr").remove(); 
+		cabecalho();
+		if (agenda != null){
+			agenda.forEach(function(item,index){			
+				$('#lista tr:last').after('<tr><td><button type="button" iditem="'+item.id+'" class="fas fa-trash-alt btn btn-danger btn-delete" id="excluir"></button></td><td>'+item.nome+'</td><td>'+item.telefone+' </td><td><a href="mailto:'+item.email+'?subject=Contato">'+item.email+'</a></td>');			
+				
+				});
+			
+			//	$('body').on('click','.btn-delete',function(){
+			//		$(this).parents('tr').remove();
+			//	});	
+			// O CÓDIGO ACIMA REMOVE A LINHA DA TABELA
+			
+				$(".btn-delete").click(function(){
+				
+				alert("Contato Excluido!");
+				// console.log($(this).attr("iditem"));
+				var listaexclusao=JSON.parse(localStorage.getItem("agenda"));		
+				//	listaexclusao.forEach(function(item,index){
+				//	console.log(item.id);
+				//	console.log((item.id === $(this).attr("iditem")));
+					
+				//	if (item.id === $(this).attr("iditem")){
+				//		console.log(item);
+				//	}
+				//	});
+				var idexclusao = $(this).attr("iditem");
+				var i;
+				for (i = 0; i < listaexclusao.length; i++){
+					if(listaexclusao[i].id == idexclusao){
+					break;
+					};
+				};
+				if(i > 0 || i < listaexclusao.length){
+					listaexclusao.splice(i,1);
+					localStorage.setItem("agenda",JSON.stringify(listaexclusao));
+					$("#Listar").click();
+				}
+			
+				});
+
+		}
+//		console.log(agenda);
+//		console.log(form.nome);
+	   }else {
+		  alert("Seu navegador não suporta localStorage");
+	}	
+});
+
+function cabecalho() {
+		document.getElementById("lista").innerHTML ='<thead><th><td>Nome:</td><td>Telefone:</td><td>Email:</td></th></thead>';			
+		document.getElementById("lista").innerHTML +='<tbody></tbody>';			
+}
+
+$("#Gravar").click(function(){
+/*if (typeof(Storage) !== "undefined") { 
+
+	  localStorage.setItem("nome", "Quadrado");
+	  localStorage.setItem("telefone", "Quadrado");
+	  localStorage.setItem("email", "Quadrado");
+
+} else {
+	  alert("Seu navegador não suporta localstorage");
+}*/
+//Para pegar um componente via jquery usa o $() dentro dele voce informa o ID
+// que inicia com #, ou classe que inicia com .(ponto) ou pelo nome do elemento.
+ 
+
+		var formulario=$("#formulario");
+		if(formulario == "")return;
+		formulario.validate();
+		if(!formulario.valid())
+		return;		
+		
+	//	console.log(getFormData(formulario));
+		if (typeof(Storage) !== "undefined") {
+	//		var txtnome=$("#nome").val();
+	//		var txtemail=$("#email").val();
+	//		var txttel=$("#telefone").val();
+			
+	//		localStorage.setItem("nome",txtnome);
+	//		localStorage.setItem("telefone",txttel);
+	//		localStorage.setItem("email",txtemail);
+	//		localStorage.setItem("form",JSON.stringify(getFormData(formulario)));
+	//		console.log(JSON.stringify(getFormData(formulario)));
+			var objform=getFormData(formulario);
+			if(!objform.id){
+				objform.id=uuidv4();
+			}
+			var dados=JSON.parse(localStorage.getItem("agenda"));
+			console.log(dados);
+			if(dados!=null){
+				dados.push(objform);
+				alert("Contato Cadastrado!");
+			}else{
+				dados=new Array();
+				dados.push(objform);
+			}
+			
+			localStorage.setItem("agenda",JSON.stringify(dados));		
+		
+	   }else{
+		  alert("Seu navegador não suporta localstorage");
+		}
+
+function getFormData($form){
+	var unindexed_array = $form.serializeArray();
+	var indexed_array = {};
+
+	$.map(unindexed_array, function(n, i){
+		indexed_array[n['name']] = n['value'];
+	});
+
+	return indexed_array;
+}
+});
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+});
+</script>
+ 			
+</body>
+</html>
